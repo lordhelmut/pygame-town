@@ -1,6 +1,7 @@
 import pygame
-from settings import *
 import logging
+from settings import *
+from player import Player
 
 # change from print to logs
 logging.basicConfig(
@@ -20,12 +21,17 @@ class Level:
         # groups for the sprites
         self.all_sprites = pygame.sprite.Group()
 
+        # start it up
+        self.setup()
+
+    def setup(self):
+        self.player = Player((640, 360), self.all_sprites)
 
     def run(self, dt):
         # print('The game is running')
-        logging.debug('The game is running')
+        # logging.debug('The game is running')
 
         # remove previous screens and draw new one
         self.display_surface.fill('black')
         self.all_sprites.draw(self.display_surface)
-        self.all_sprites.update()
+        self.all_sprites.update(dt)
