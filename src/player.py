@@ -44,8 +44,19 @@ class Player(pygame.sprite.Sprite):
         logging.debug(f'direction: {self.direction}')
 
     def move(self, dt):
-        self.pos += self.direction * self.speed * dt
-        self.rect.center = self.pos
+        # vector math, needs to be a positive number
+        if self.direction.magnitude() > 0:
+            # normalize the vector movement
+            # otherwise player moves 1 right, plus 1 up, a^2 + b^2 = c^2 (approx 1.4)
+            self.direction = self.direction.normalize()
+        logging.debug(f'normalized: {self.direction}')
+
+        # horizontal movement
+        self.pos.x += self.direction.x * self.speed * dt
+        self.rect.centerx = self.pos.x
+        # vertical movement
+        self.pos.y += self.direction.y * self.speed * dt
+        self.rect.centery = self.pos.y
 
     def update(self, dt):
         self.input()
