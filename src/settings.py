@@ -50,3 +50,5 @@ PURCHASE_PRICES = {
 	'corn': 4,
 	'tomato': 5
 }
+
+LOGGINGOPTS = 'INFO'
