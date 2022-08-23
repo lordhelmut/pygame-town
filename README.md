@@ -1,0 +1,2 @@
+# Pygame learning
+Thanks to [https://www.freecodecamp.org/news/create-stardew-valley-using-python-and-pygame/](https://www.freecodecamp.org/news/create-stardew-valley-using-python-and-pygame/) for the original tutorial content and code inspiration.
