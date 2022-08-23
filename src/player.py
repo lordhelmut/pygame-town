@@ -108,6 +108,8 @@ class Player(pygame.sprite.Sprite):
                 self.timers['tool use'].activate()
                 # this halts the player while using a tool
                 self.direction = pygame.math.Vector2()
+                # this resets the frame and plays 0 animation (plays the animation from the start)
+                self.frame_index = 0
                 if (LOGGINGOPTS == 'DEBUG'):
                     logging.debug(f'self.timers: {self.timers}')
 
@@ -122,10 +124,15 @@ class Player(pygame.sprite.Sprite):
 
         # tool usage
         if self.timers['tool use'].active:
-            self.status = self.status.split('_')[0] + '_axe'
+            self.status = self.status.split('_')[0] + '_' + self.selected_tool
 
         if (LOGGINGOPTS == 'DEBUG'):
             logging.debug(f'movement: {movement} self.status: {self.status}')
+
+    def update_timers(self):
+        for timer in self.timers.values():
+            timer.update()
+
 
     def move(self, dt):
         # vector math, needs to be a positive number
@@ -146,5 +153,6 @@ class Player(pygame.sprite.Sprite):
     def update(self, dt):
         self.input()
         self.get_status()
+        self.update_timers()
         self.move(dt)
         self.animate(dt)
