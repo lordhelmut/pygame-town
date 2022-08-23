@@ -3,6 +3,7 @@ import pygame
 import logging
 from settings import *
 from support import *
+from timer import Timer
 
 
 class Player(pygame.sprite.Sprite):
@@ -22,6 +23,18 @@ class Player(pygame.sprite.Sprite):
         self.direction = pygame.math.Vector2(0, 0)
         self.pos = pygame.math.Vector2(self.rect.center)
         self.speed = 200
+
+        # what time is it
+        self.timers = {
+            'tool use': Timer(350, self.use_tool)
+        }
+
+        # tool usages
+        self.selected_tool = 'axe'
+
+    def use_tool(self):
+        if (LOGGINGOPTS == 'DEBUG'):
+            logging.debug(f'self.selected_tool: {self.selected_tool}')
 
     def import_assets(self):
         logging.info('Loading assets')
@@ -51,38 +64,52 @@ class Player(pygame.sprite.Sprite):
         # get the key presses
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_UP]:
-            self.direction.y = -1
-            # set the correct animation surface
-            self.status = 'up'
-            if (LOGGINGOPTS == 'DEBUG'):
-                logging.debug(f'up arrow pressed. self.status: {self.status}')
-        elif keys[pygame.K_DOWN]:
-            self.direction.y = 1
-            self.status = 'down'
-            if (LOGGINGOPTS == 'DEBUG'):
-                logging.debug('down arrow pressed. self.status: {self.status}')
-        else:
-            # this keeps the character from moving indefinitely
-            self.direction.y = 0
+        if not self.timers['tool use'].active:
+            # cardinal movements
+            if keys[pygame.K_UP]:
+                self.direction.y = -1
+                # set the correct animation surface
+                self.status = 'up'
+                if (LOGGINGOPTS == 'DEBUG'):
+                    logging.debug(
+                        f'up arrow pressed. self.status: {self.status}')
+            elif keys[pygame.K_DOWN]:
+                self.direction.y = 1
+                self.status = 'down'
+                if (LOGGINGOPTS == 'DEBUG'):
+                    logging.debug(
+                        'down arrow pressed. self.status: {self.status}')
+            else:
+                # this keeps the character from moving indefinitely
+                self.direction.y = 0
 
-        if keys[pygame.K_RIGHT]:
-            self.direction.x = 1
-            self.status = 'right'
+            if keys[pygame.K_RIGHT]:
+                self.direction.x = 1
+                self.status = 'right'
+                if (LOGGINGOPTS == 'DEBUG'):
+                    logging.debug(
+                        'right arrow pressed. self.status: {self.status}')
+            elif keys[pygame.K_LEFT]:
+                self.direction.x = -1
+                self.status = 'left'
+                if (LOGGINGOPTS == 'DEBUG'):
+                    logging.debug(
+                        'left arrow pressed. self.status: {self.status}')
+            else:
+                # this keeps the character from moving indefinitely
+                self.direction.x = 0
             if (LOGGINGOPTS == 'DEBUG'):
                 logging.debug(
-                    'right arrow pressed. self.status: {self.status}')
-        elif keys[pygame.K_LEFT]:
-            self.direction.x = -1
-            self.status = 'left'
-            if (LOGGINGOPTS == 'DEBUG'):
-                logging.debug('left arrow pressed. self.status: {self.status}')
-        else:
-            # this keeps the character from moving indefinitely
-            self.direction.x = 0
-        if (LOGGINGOPTS == 'DEBUG'):
-            logging.debug(
-                f'direction: {self.direction}. self.status: {self.status}')
+                    f'direction: {self.direction}. self.status: {self.status}')
+
+            # tool used
+            if keys[pygame.K_SPACE]:
+                # timer for tool usage
+                self.timers['tool use'].activate()
+                # this halts the player while using a tool
+                self.direction = pygame.math.Vector2()
+                if (LOGGINGOPTS == 'DEBUG'):
+                    logging.debug(f'self.timers: {self.timers}')
 
     def get_status(self):
         # if player is not moving, add "_idle" to status
@@ -92,6 +119,11 @@ class Player(pygame.sprite.Sprite):
             # always returns the root file path
             # e.g. "up" such that "up_idle" will also return "up"
             self.status = self.status.split('_')[0] + '_idle'
+
+        # tool usage
+        if self.timers['tool use'].active:
+            self.status = self.status.split('_')[0] + '_axe'
+
         if (LOGGINGOPTS == 'DEBUG'):
             logging.debug(f'movement: {movement} self.status: {self.status}')
 
