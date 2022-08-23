@@ -11,8 +11,11 @@ class Player(pygame.sprite.Sprite):
 
         # init setups
         self.import_assets()
-        self.image = pygame.Surface((32, 64))
-        self.image.fill('green')
+        self.status = 'down_idle'
+        self.frame_index = 0
+
+        # set the image to the status of the person
+        self.image = self.animations[self.status][self.frame_index]
         self.rect = self.image.get_rect(center=pos)
 
         # movement attribute
@@ -32,6 +35,8 @@ class Player(pygame.sprite.Sprite):
         for animation in self.animations.keys():
             full_path = 'graphics/character/' + animation
             self.animations[animation] = import_folder(full_path)
+            if (LOGGINGOPTS == 'DEBUG'):
+                logging.debug(f'self.animations: {self.animations}')
 
     def input(self):
 
