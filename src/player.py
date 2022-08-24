@@ -146,7 +146,7 @@ class Player(pygame.sprite.Sprite):
                 # this resets the frame and plays 0 animation (plays the animation from the start)
                 self.frame_index = 0
                 if (LOGGINGOPTS == 'DEBUG'):
-                    logging.debug(f'self.timers: {self.timers}')
+                    logging.debug(f'seed activated')
 
             # change seed
             if keys[pygame.K_e] and not self.timers['seed switch'].active:
