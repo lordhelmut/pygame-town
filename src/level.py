@@ -2,6 +2,7 @@ import pygame
 import logging
 from settings import *
 from player import Player
+from overlay import Overlay
 
 # change from print to logs
 logging.basicConfig(
@@ -23,15 +24,16 @@ class Level:
 
         # start it up
         self.setup()
+        self.overlay = Overlay(self.player)
 
     def setup(self):
         self.player = Player((640, 360), self.all_sprites)
 
     def run(self, dt):
-        # print('The game is running')
-        # logging.debug('The game is running')
-
         # remove previous screens and draw new one
         self.display_surface.fill('black')
         self.all_sprites.draw(self.display_surface)
         self.all_sprites.update(dt)
+
+        # get the overlay from the overlay display function
+        self.overlay.display()
