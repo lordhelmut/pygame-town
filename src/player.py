@@ -27,7 +27,9 @@ class Player(pygame.sprite.Sprite):
         # what time is it
         self.timers = {
             'tool use': Timer(350, self.use_tool),
-            'tool switch': Timer(200)
+            'tool switch': Timer(200),
+            'seed use': Timer(350, self.use_seed),
+            'seed switch': Timer(200)
         }
 
         # tool usages
@@ -35,9 +37,18 @@ class Player(pygame.sprite.Sprite):
         self.tool_index = 0
         self.selected_tool = self.tools[self.tool_index]
 
+        # seed usages
+        self.seeds = ['corn', 'tomato']
+        self.seed_index = 0
+        self.selected_seed = self.seeds[self.seed_index]
+
     def use_tool(self):
         if (LOGGINGOPTS == 'DEBUG'):
             logging.debug(f'self.selected_tool: {self.selected_tool}')
+
+    def use_seed(self):
+        if (LOGGINGOPTS == 'DEBUG'):
+            logging.debug(f'self.selected_tool: {self.selected_seed}')
 
     def import_assets(self):
         logging.info('Loading assets')
@@ -120,10 +131,32 @@ class Player(pygame.sprite.Sprite):
             if keys[pygame.K_q] and not self.timers['tool switch'].active:
                 self.timers['tool switch'].activate()
                 self.tool_index += 1
+                # make sure the tool is less than the length of the index
                 self.tool_index = self.tool_index if self.tool_index < len(
                     self.tools) else 0
                 self.selected_tool = self.tools[self.tool_index]
                 logging.info(f'selected tool: {self.selected_tool}')
+
+            # seed used
+            if keys[pygame.K_LCTRL]:
+                # timer for seed usage
+                self.timers['seed use'].activate()
+                # this halts the player while using a seed
+                self.direction = pygame.math.Vector2()
+                # this resets the frame and plays 0 animation (plays the animation from the start)
+                self.frame_index = 0
+                if (LOGGINGOPTS == 'DEBUG'):
+                    logging.debug(f'self.timers: {self.timers}')
+
+            # change seed
+            if keys[pygame.K_e] and not self.timers['seed switch'].active:
+                self.timers['seed switch'].activate()
+                self.seed_index += 1
+                # make sure the seed is less than the length of the index
+                self.seed_index = self.seed_index if self.seed_index < len(
+                    self.seeds) else 0
+                self.selected_seed = self.seeds[self.seed_index]
+                logging.info(f'selected seed: {self.selected_seed}')
 
 
     def get_status(self):
