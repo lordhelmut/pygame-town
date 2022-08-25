@@ -3,7 +3,7 @@ import logging
 from settings import *
 from player import Player
 from overlay import Overlay
-from sprites import GenericSprites, WaterSprites
+from sprites import GenericSprites, WaterSprites, TreeSprites, WildFlowerSprites
 from pytmx.util_pygame import load_pygame
 from support import *
 
@@ -73,10 +73,19 @@ class Level:
             if (LOGGINGOPTS == 'DEBUG'):
                 logging.debug(f'frames: {water_frames} x: {x} y: {y}')
 
-            # trees
+        # wildflowers
+        # the image layer is slightly different as it was created differently in "Tiled" ...
+        # ... but image placement logic is the same
+        for obj in tmx_data.get_layer_by_name('Decoration'):
+            WildFlowerSprites((obj.x, obj.y), obj.image, self.all_sprites)
+            if (LOGGINGOPTS == 'DEBUG'):
+                logging.debug(f'decoration object: {obj} x: {x} y: {y}')
 
-            # wildflowers
-
+        # trees
+        for obj in tmx_data.get_layer_by_name('Trees'):
+            TreeSprites((obj.x, obj.y), obj.image, self.all_sprites, obj.name)
+            if (LOGGINGOPTS == 'DEBUG'):
+                logging.debug(f'tree object: {obj.name} x: {x} y: {y}')
 
         self.player = Player((640, 360), self.all_sprites)
         # create the floor

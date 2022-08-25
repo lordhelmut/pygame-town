@@ -39,3 +39,13 @@ class WaterSprites(GenericSprites):
 
     def update(self, dt):
         self.animate(dt)
+
+
+class WildFlowerSprites(GenericSprites):
+    def __init__(self, pos, surf, groups) -> None:
+        super().__init__(pos, surf, groups)
+
+
+class TreeSprites(GenericSprites):
+    def __init__(self, pos, surf, groups, name) -> None:
+        super().__init__(pos, surf, groups)
