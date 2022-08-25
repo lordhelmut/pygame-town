@@ -24,6 +24,8 @@ class Level:
 
         # groups for the sprites
         self.all_sprites = CameraGroup()
+        # keep track of things player can collide with
+        self.collision_sprites = pygame.sprite.Group()
 
         # start it up
         self.setup()
@@ -60,7 +62,7 @@ class Level:
         # fence
         for x, y, surf in tmx_data.get_layer_by_name('Fence').tiles():
             GenericSprites((x * TILE_SIZE, y * TILE_SIZE), surf,
-                           self.all_sprites, LAYERS['main'])
+                           [self.all_sprites, self.collision_sprites], LAYERS['main'])
             if (LOGGINGOPTS == 'DEBUG'):
                 logging.debug(f'layer: {layer} x: {x} y: {y}')
 
@@ -77,17 +79,31 @@ class Level:
         # the image layer is slightly different as it was created differently in "Tiled" ...
         # ... but image placement logic is the same
         for obj in tmx_data.get_layer_by_name('Decoration'):
-            WildFlowerSprites((obj.x, obj.y), obj.image, self.all_sprites)
+            WildFlowerSprites((obj.x, obj.y), obj.image, [
+                              self.all_sprites, self.collision_sprites])
             if (LOGGINGOPTS == 'DEBUG'):
                 logging.debug(f'decoration object: {obj} x: {x} y: {y}')
 
         # trees
         for obj in tmx_data.get_layer_by_name('Trees'):
-            TreeSprites((obj.x, obj.y), obj.image, self.all_sprites, obj.name)
+            TreeSprites((obj.x, obj.y), obj.image, [
+                        self.all_sprites, self.collision_sprites], obj.name)
             if (LOGGINGOPTS == 'DEBUG'):
                 logging.debug(f'tree object: {obj.name} x: {x} y: {y}')
 
-        self.player = Player((640, 360), self.all_sprites)
+        # collision tiles - these are hard coded in the map layer, not by the objects
+        for x, y, surf in tmx_data.get_layer_by_name('Collision').tiles():
+            # this is not drawn or updated - just has a non-visible collision surface
+            GenericSprites((x * TILE_SIZE, y * TILE_SIZE),
+                           pygame.Surface((TILE_SIZE, TILE_SIZE)), self.collision_sprites)
+
+        # player
+        # check the map layer and place the player in the 'start' position
+        for obj in tmx_data.get_layer_by_name('Player'):
+            if obj.name == 'Start':
+                self.player = Player((obj.x, obj.y), self.all_sprites,
+                                     self.collision_sprites)
+
         # create the floor
         floor_image = 'graphics/world/ground.png'
         GenericSprites(
