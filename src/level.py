@@ -3,7 +3,9 @@ import logging
 from settings import *
 from player import Player
 from overlay import Overlay
-from sprites import GenericSprites
+from sprites import GenericSprites, WaterSprites, TreeSprites, WildFlowerSprites
+from pytmx.util_pygame import load_pygame
+from support import *
 
 # change from print to logs
 logging.basicConfig(
@@ -28,6 +30,63 @@ class Level:
         self.overlay = Overlay(self.player)
 
     def setup(self):
+
+        # the map was created in "Tiled" software - mapeditor.org
+
+        # load the map file
+        map_file = 'data/map.tmx'
+        tmx_data = load_pygame(map_file)
+
+        # import a ton of different things ...
+
+        # house layers need to be separate in pygame
+        # bottom (floor) -> walls -> furniture bottom -> furniture top
+
+        # bottom layer in house - order is important, make sure floor is drawn before bottom
+        for layer in ['HouseFloor', 'HouseFurnitureBottom']:
+            for x, y, surf in tmx_data.get_layer_by_name(layer).tiles():
+                GenericSprites((x * TILE_SIZE, y * TILE_SIZE), surf,
+                               self.all_sprites, LAYERS['house bottom'])
+                if (LOGGINGOPTS == 'DEBUG'):
+                    logging.debug(f'layer: {layer} x: {x} y: {y}')
+
+        for layer in ['HouseWalls', 'HouseFurnitureTop']:
+            for x, y, surf in tmx_data.get_layer_by_name(layer).tiles():
+                GenericSprites((x * TILE_SIZE, y * TILE_SIZE), surf,
+                               self.all_sprites, LAYERS['main'])
+                if (LOGGINGOPTS == 'DEBUG'):
+                    logging.debug(f'layer: {layer} x: {x} y: {y}')
+
+        # fence
+        for x, y, surf in tmx_data.get_layer_by_name('Fence').tiles():
+            GenericSprites((x * TILE_SIZE, y * TILE_SIZE), surf,
+                           self.all_sprites, LAYERS['main'])
+            if (LOGGINGOPTS == 'DEBUG'):
+                logging.debug(f'layer: {layer} x: {x} y: {y}')
+
+        # water
+        water_folder = 'graphics/water'
+        water_frames = import_folder(water_folder)
+        for x, y, surf in tmx_data.get_layer_by_name('Water').tiles():
+            WaterSprites((x * TILE_SIZE, y * TILE_SIZE),
+                         water_frames, self.all_sprites)
+            if (LOGGINGOPTS == 'DEBUG'):
+                logging.debug(f'frames: {water_frames} x: {x} y: {y}')
+
+        # wildflowers
+        # the image layer is slightly different as it was created differently in "Tiled" ...
+        # ... but image placement logic is the same
+        for obj in tmx_data.get_layer_by_name('Decoration'):
+            WildFlowerSprites((obj.x, obj.y), obj.image, self.all_sprites)
+            if (LOGGINGOPTS == 'DEBUG'):
+                logging.debug(f'decoration object: {obj} x: {x} y: {y}')
+
+        # trees
+        for obj in tmx_data.get_layer_by_name('Trees'):
+            TreeSprites((obj.x, obj.y), obj.image, self.all_sprites, obj.name)
+            if (LOGGINGOPTS == 'DEBUG'):
+                logging.debug(f'tree object: {obj.name} x: {x} y: {y}')
+
         self.player = Player((640, 360), self.all_sprites)
         # create the floor
         floor_image = 'graphics/world/ground.png'
@@ -64,7 +123,8 @@ class CameraGroup(pygame.sprite.Group):
         self.offset.y = player.rect.centery - SCREEN_HEIGHT / 2
 
         for layer in LAYERS.values():
-            for sprite in self.sprites():
+            # create a lambda function to sort lower value layers to be drawn below others based on 'y'
+            for sprite in sorted(self.sprites(), key=lambda sprite: sprite.rect.centery):
                 if sprite.z == layer:
                     offset_rect = sprite.rect.copy()
                     offset_rect.center -= self.offset
