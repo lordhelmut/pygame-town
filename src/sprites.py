@@ -75,7 +75,7 @@ class WildFlowerSprites(GenericSprites):
         self.hitbox = self.rect.copy().inflate(-20, -self.rect.height * 0.9)
 
 class TreeSprites(GenericSprites):
-    def __init__(self, pos, surf, groups, name) -> None:
+    def __init__(self, pos, surf, groups, name, player_add) -> None:
         super().__init__(pos, surf, groups)
 
         # hitbox - will inherit from GenericSprites
@@ -97,6 +97,8 @@ class TreeSprites(GenericSprites):
         self.apple_sprites = pygame.sprite.Group()
         self.create_fruit()
 
+        self.player_add = player_add
+
     def damage(self):
         self.health -= 1
 
@@ -109,6 +111,7 @@ class TreeSprites(GenericSprites):
                 surf=random_apple.image,
                 groups=self.groups()[0],
                 z=LAYERS['fruit'])
+            self.player_add('apple')
             random_apple.kill()  # remove from sprite groups
             logging.info(
                 f'death clock: {self.health}  alive check: {self.alive}')
@@ -129,6 +132,7 @@ class TreeSprites(GenericSprites):
             # update hitbox too
             self.hitbox = self.rect.copy().inflate(-10, -self.rect.height * 0.6)
             self.alive = False
+            self.player_add('wood')
             logging.info(f'tree died.  health: {self.health}')
 
     def update(self, dt):

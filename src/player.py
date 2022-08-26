@@ -52,6 +52,14 @@ class Player(pygame.sprite.Sprite):
         self.seed_index = 0
         self.selected_seed = self.seeds[self.seed_index]
 
+        # inventory
+        self.item_inventory = {
+            'wood': 0,
+            'apple': 0,
+            'corn': 0,
+            'tomato': 0
+        }
+
         # interactive position relative to player
         self.tree_sprites = tree_sprites
 
@@ -186,6 +194,11 @@ class Player(pygame.sprite.Sprite):
                     self.seeds) else 0
                 self.selected_seed = self.seeds[self.seed_index]
                 logging.info(f'selected seed: {self.selected_seed}')
+
+            if keys[pygame.K_i]:
+                # debug whats in the inventory for now
+                logging.info(f'inventory: {self.item_inventory}')
+
 
     def get_status(self):
         # if player is not moving, add "_idle" to status
