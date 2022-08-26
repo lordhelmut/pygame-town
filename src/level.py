@@ -82,8 +82,13 @@ class Level:
 
         # trees
         for obj in tmx_data.get_layer_by_name('Trees'):
-            TreeSprites((obj.x, obj.y), obj.image, [
-                        self.all_sprites, self.collision_sprites, self.tree_sprites], obj.name)
+            TreeSprites(
+                pos=(obj.x, obj.y),
+                surf=obj.image,
+                groups=[
+                    self.all_sprites, self.collision_sprites, self.tree_sprites],
+                name=obj.name,
+                player_add=self.player_add)
             if (LOGGINGOPTS == 'DEBUG'):
                 logging.debug(f'tree object: {obj.name} x: {x} y: {y}')
 
@@ -110,6 +115,10 @@ class Level:
             surf=pygame.image.load(floor_image).convert_alpha(),
             groups=self.all_sprites,
             z=LAYERS['ground'])
+
+    def player_add(self, item):
+        self.player.item_inventory[item] += 1
+
 
     def run(self, dt):
         # remove previous screens and draw new one
