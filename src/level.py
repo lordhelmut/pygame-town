@@ -1,3 +1,4 @@
+from typing import Collection
 import pygame
 import logging
 from settings import *
@@ -18,6 +19,9 @@ class Level:
         self.all_sprites = CameraGroup()
         # keep track of things player can collide with
         self.collision_sprites = pygame.sprite.Group()
+
+        # need to know where the trees are relative to player
+        self.tree_sprites = pygame.sprite.Group()
 
         # start it up
         self.setup()
@@ -79,7 +83,7 @@ class Level:
         # trees
         for obj in tmx_data.get_layer_by_name('Trees'):
             TreeSprites((obj.x, obj.y), obj.image, [
-                        self.all_sprites, self.collision_sprites], obj.name)
+                        self.all_sprites, self.collision_sprites, self.tree_sprites], obj.name)
             if (LOGGINGOPTS == 'DEBUG'):
                 logging.debug(f'tree object: {obj.name} x: {x} y: {y}')
 
@@ -93,8 +97,11 @@ class Level:
         # check the map layer and place the player in the 'start' position
         for obj in tmx_data.get_layer_by_name('Player'):
             if obj.name == 'Start':
-                self.player = Player((obj.x, obj.y), self.all_sprites,
-                                     self.collision_sprites)
+                self.player = Player(
+                    pos=(obj.x, obj.y),
+                    group=self.all_sprites,
+                    collision_sprites=self.collision_sprites,
+                    tree_sprites=self.tree_sprites)
 
         # create the floor
         floor_image = 'graphics/world/ground.png'
@@ -140,3 +147,13 @@ class CameraGroup(pygame.sprite.Group):
                     self.display_surface.blit(sprite.image, offset_rect)
                     if (LOGGINGOPTS == 'DEBUG'):
                         logging.debug(f'layer is {sprite.z}')
+
+                    # # find location of target hit
+                    if (SPRITEDEBUG=='DEBUG'):
+                        if sprite == player:
+                            pygame.draw.rect(self.display_surface,'red',offset_rect,5)
+                            hitbox_rect = player.hitbox.copy()
+                            hitbox_rect.center = offset_rect.center
+                            pygame.draw.rect(self.display_surface,'green',hitbox_rect,5)
+                            target_pos = offset_rect.center + PLAYER_TOOL_OFFSET[player.status.split('_')[0]]
+                            pygame.draw.circle(self.display_surface,'blue',target_pos,5)

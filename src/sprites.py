@@ -1,7 +1,9 @@
+from secrets import choice
 import pygame
 import logging
 from settings import *
-from random import randint
+from timer import Timer
+from random import randint, choice
 
 class GenericSprites(pygame.sprite.Sprite):
     def __init__(self, pos, surf, groups, z=LAYERS['main']) -> None:
@@ -58,6 +60,14 @@ class TreeSprites(GenericSprites):
 
         # hitbox - will inherit from GenericSprites
 
+        # tree attributes
+        self.health = 5  # hardcode to 5 hits per tree
+        self.alive = True
+        # what tree looks like when tree dies
+        stump_path = f'graphics/stumps/{"small" if name == "small" else "large"}.png'
+        self.stump_surf = pygame.image.load(stump_path).convert_alpha()
+        self.invul_timer = Timer(200)
+
         # apples
         appleimage_path = 'graphics/fruit/apple.png'
         self.apple_surf = pygame.image.load(appleimage_path)
@@ -67,10 +77,32 @@ class TreeSprites(GenericSprites):
         self.apple_sprites = pygame.sprite.Group()
         self.create_fruit()
 
+    def damage(self):
+        self.health -= 1
+
+        # remove an apple - such that the list has apples available
+        if len(self.apple_sprites.sprites()) > 0:
+            random_apple = choice(self.apple_sprites.sprites())
+            random_apple.kill()  # remove from sprite groups
+
+    def check_death(self):
+        if self.health <= 0:
+            # change the image
+            self.image = self.stump_surf
+            # update the position of the new image to be the same position of previous
+            self.rect = self.image.get_rect(midbottom=self.rect.midbottom)
+            # update hitbox too
+            self.hitbox = self.rect.copy().inflate(-10, -self.rect.height * 0.6)
+            self.alive = False
+            logging.info(f'tree died.  health: {self.health}')
+
+    def update(self, dt):
+        if self.alive:
+            self.check_death()
+
     def create_fruit(self):
         for pos in self.apple_pos:
             appleluck = randint(0, 10)
-            logging.info(f'appleluck: {appleluck}')
             if appleluck < 2:
                 x = pos[0] + self.rect.left
                 y = pos[1] + self.rect.top
@@ -79,3 +111,5 @@ class TreeSprites(GenericSprites):
                     surf=self.apple_surf,
                     groups=[self.apple_sprites, self.groups()[0]],
                     z=LAYERS['fruit'])
+            if (LOGGINGOPTS == 'DEBUG'):
+                logging.debug(f'appleluck: {appleluck}')
