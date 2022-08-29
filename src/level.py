@@ -1,12 +1,14 @@
+from ast import Interactive
 from typing import Collection
 import pygame
 import logging
 from settings import *
 from player import Player
 from overlay import Overlay
-from sprites import GenericSprites, WaterSprites, TreeSprites, WildFlowerSprites
+from sprites import GenericSprites, WaterSprites, TreeSprites, WildFlowerSprites, InteractionSprites
 from pytmx.util_pygame import load_pygame
 from support import *
+from transition import Transition
 
 
 class Level:
@@ -23,9 +25,15 @@ class Level:
         # need to know where the trees are relative to player
         self.tree_sprites = pygame.sprite.Group()
 
+        # interaction with objects
+        self.interaction_sprites = pygame.sprite.Group()
+
         # start it up
         self.setup()
         self.overlay = Overlay(self.player)
+
+        # new transition class
+        self.transition = Transition(self.reset_scene, self.player)
 
     def setup(self):
 
@@ -106,7 +114,15 @@ class Level:
                     pos=(obj.x, obj.y),
                     group=self.all_sprites,
                     collision_sprites=self.collision_sprites,
-                    tree_sprites=self.tree_sprites)
+                    tree_sprites=self.tree_sprites,
+                    interaction=self.interaction_sprites)
+            # check map layer and see if player is in 'bed' position
+            if obj.name == 'Bed':
+                InteractionSprites(
+                    pos=(obj.x, obj.y),
+                    size=(obj.width, obj.height),
+                    groups=self.interaction_sprites,
+                    name=obj.name)
 
         # create the floor
         floor_image = 'graphics/world/ground.png'
@@ -119,6 +135,15 @@ class Level:
     def player_add(self, item):
         self.player.item_inventory[item] += 1
 
+    def reset_scene(self):
+        # add apples on trees
+        for tree in self.tree_sprites.sprites():
+            # look for existing fruit
+            for apple in tree.apple_sprites.sprites():
+                # remove existing apples
+                apple.kill()
+            # purged all apples above, now re-add
+            tree.create_fruit()
 
     def run(self, dt):
         # remove previous screens and draw new one
@@ -129,6 +154,10 @@ class Level:
 
         # get the overlay from the overlay display function
         self.overlay.display()
+
+        # check if need to change times
+        if self.player.sleep:
+            self.transition.play()
 
 
 class CameraGroup(pygame.sprite.Group):

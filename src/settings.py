@@ -63,4 +63,4 @@ logging.basicConfig(
     datefmt='%Y-%m-%d %H:%M:%S',
 )
 
-SPRITEDEBUG=str('debug').upper()
+SPRITEDEBUG=str('info').upper()
