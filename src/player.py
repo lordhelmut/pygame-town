@@ -64,6 +64,9 @@ class Player(pygame.sprite.Sprite):
         self.tree_sprites = tree_sprites
         self.interaction = interaction
 
+        # create & set attribute
+        self.sleep = False
+
     def use_tool(self):
         if self.selected_tool == 'hoe':
             pass
@@ -201,12 +204,15 @@ class Player(pygame.sprite.Sprite):
                     self, self.interaction, False)
                 # check if sprite has collided with the  location
                 if collided_interaction_sprite:
+                    logging.info(
+                        f'You have reached a collision with : {collided_interaction_sprite[0].name}')
                     if collided_interaction_sprite[0].name == 'Trader':
-                        logging.info(
-                            f'You have reached the trader : {collided_interaction_sprite[0].name}')
+                        pass
                     else:
                         # point the character after the collision to make it looking at bed
                         self.status = 'left_idle'
+                        # now sleep
+                        self.sleep = True
 
             if keys[pygame.K_i]:
                 # debug whats in the inventory for now
