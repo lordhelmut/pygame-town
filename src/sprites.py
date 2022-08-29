@@ -5,6 +5,7 @@ from settings import *
 from timer import Timer
 from random import randint, choice
 
+
 class GenericSprites(pygame.sprite.Sprite):
     def __init__(self, pos, surf, groups, z=LAYERS['main']) -> None:
         super().__init__(groups)
@@ -19,6 +20,18 @@ class GenericSprites(pygame.sprite.Sprite):
         # ... clip through more naturally looking rather than avoiding the object altogether
         self.hitbox = self.rect.copy().inflate(-self.rect.width *
                                                0.2, -self.rect.height * 0.75)
+
+
+class InteractionSprites(GenericSprites):
+    # don't need to init a surface as this is not a visible sprite
+    def __init__(self, pos, size, groups, name) -> None:
+        # even though not visible, still need to be interacted with
+        surf = pygame.Surface(size)
+        super().__init__(pos, surf, groups)
+
+        # this will get passed in from the call
+        # but is defined from the 'tiled' map
+        self.name = name
 
 
 class ParticleEffects(GenericSprites):
@@ -73,6 +86,7 @@ class WildFlowerSprites(GenericSprites):
         super().__init__(pos, surf, groups)
 
         self.hitbox = self.rect.copy().inflate(-20, -self.rect.height * 0.9)
+
 
 class TreeSprites(GenericSprites):
     def __init__(self, pos, surf, groups, name, player_add) -> None:

@@ -7,7 +7,7 @@ from timer import Timer
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, group, collision_sprites, tree_sprites):
+    def __init__(self, pos, group, collision_sprites, tree_sprites, interaction):
         super().__init__(group)
 
         # init setups
@@ -62,6 +62,7 @@ class Player(pygame.sprite.Sprite):
 
         # interactive position relative to player
         self.tree_sprites = tree_sprites
+        self.interaction = interaction
 
     def use_tool(self):
         if self.selected_tool == 'hoe':
@@ -194,6 +195,18 @@ class Player(pygame.sprite.Sprite):
                     self.seeds) else 0
                 self.selected_seed = self.seeds[self.seed_index]
                 logging.info(f'selected seed: {self.selected_seed}')
+
+            if keys[pygame.K_RETURN]:
+                collided_interaction_sprite = pygame.sprite.spritecollide(
+                    self, self.interaction, False)
+                # check if sprite has collided with the  location
+                if collided_interaction_sprite:
+                    if collided_interaction_sprite[0].name == 'Trader':
+                        logging.info(
+                            f'You have reached the trader : {collided_interaction_sprite[0].name}')
+                    else:
+                        # point the character after the collision to make it looking at bed
+                        self.status = 'left_idle'
 
             if keys[pygame.K_i]:
                 # debug whats in the inventory for now
