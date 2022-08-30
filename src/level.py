@@ -119,7 +119,8 @@ class Level:
                     group=self.all_sprites,
                     collision_sprites=self.collision_sprites,
                     tree_sprites=self.tree_sprites,
-                    interaction=self.interaction_sprites)
+                    interaction=self.interaction_sprites,
+                    soil_layer=self.soil_layer)
             # check map layer and see if player is in 'bed' position
             if obj.name == 'Bed':
                 InteractionSprites(
