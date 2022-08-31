@@ -1,8 +1,10 @@
 import logging
 from re import T, X
 import pygame
+from random import choice
 from settings import *
 from pytmx.util_pygame import load_pygame
+from sprites import WaterSprites
 from support import *
 
 
@@ -15,16 +17,28 @@ class SoilTileSprites(pygame.sprite.Sprite):
         self.z = LAYERS['soil']
 
 
+class WaterTileSprites(pygame.sprite.Sprite):
+    def __init__(self, pos, surf, groups) -> None:
+        super().__init__(groups)
+
+        self.image = surf
+        self.rect = self.image.get_rect(topleft=pos)
+        self.z = LAYERS['soil water']
+
+
 class SoilLayer:
     def __init__(self, all_sprites) -> None:
 
         # sprite groups
         self.all_sprites = all_sprites
         self.soil_sprites = pygame.sprite.Group()
+        self.water_sprites = pygame.sprite.Group()
 
         # better soil animations
         soil_fol_path = 'graphics/soil/'
         self.soil_surfs = import_folder_dict(soil_fol_path)
+        water_fol_path = 'graphics/soil_water/'
+        self.water_surfs = import_folder(water_fol_path)
 
         # instantiate the class methods
         self.create_soil_grid()
@@ -80,7 +94,17 @@ class SoilLayer:
     def water(self, target_pos):
         for soil_sprite in self.soil_sprites.sprites():
             if soil_sprite.rect.collidepoint(target_pos):
-                logging.info(f'soil tiled watered {soil_sprite}')
+
+                # 1 add entry to soil grid for tile -> 'W' to cell
+                x = soil_sprite.rect.x // TILE_SIZE
+                y = soil_sprite.rect.y // TILE_SIZE
+                self.grid[y][x].append('W')
+                # 2 overlay water sprite
+                WaterTileSprites(
+                    pos=soil_sprite.rect.topleft,
+                    surf=choice(self.water_surfs),
+                    groups=[self.all_sprites, self.water_sprites])
+
 
     def create_soil_tiles(self):
         self.soil_sprites.empty()
