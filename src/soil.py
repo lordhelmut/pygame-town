@@ -14,6 +14,7 @@ class SoilTileSprites(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(topleft=pos)
         self.z = LAYERS['soil']
 
+
 class SoilLayer:
     def __init__(self, all_sprites) -> None:
 
@@ -21,9 +22,6 @@ class SoilLayer:
         self.all_sprites = all_sprites
         self.soil_sprites = pygame.sprite.Group()
 
-        # graphics
-        soil_surf_path = 'graphics/soil/o.png'
-        self.soil_surf = pygame.image.load(soil_surf_path)
         # better soil animations
         soil_fol_path = 'graphics/soil/'
         self.soil_surfs = import_folder_dict(soil_fol_path)
@@ -78,6 +76,11 @@ class SoilLayer:
                     # add attribute for farming - 'X'
                     self.grid[y][x].append('X')
                     self.create_soil_tiles()
+
+    def water(self, target_pos):
+        for soil_sprite in self.soil_sprites.sprites():
+            if soil_sprite.rect.collidepoint(target_pos):
+                logging.info(f'soil tiled watered {soil_sprite}')
 
     def create_soil_tiles(self):
         self.soil_sprites.empty()
