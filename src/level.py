@@ -171,6 +171,9 @@ class Level:
         # get the overlay from the overlay display function
         self.overlay.display()
 
+        if self.raining:
+            self.rain.update()
+
         # check if need to change times
         if self.player.sleep:
             self.transition.play()

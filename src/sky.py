@@ -3,7 +3,7 @@ import pygame
 from settings import *
 from support import import_folder
 from sprites import GenericSprites
-from random import randint
+from random import randint, choice
 
 
 class Drop(GenericSprites):
@@ -50,10 +50,20 @@ class Rain:
             'graphics/world/ground.png').get_size()
 
     def create_floor(self):
-        Drop()
+        Drop(
+            pos=(randint(0, self.floor_w), randint(0, self.floor_h)),
+            moving=False,
+            surf=choice(self.rain_floor),
+            groups=self.all_sprites,
+            z=LAYERS['rain floor'])
 
     def create_drops(self):
-        pass
+        Drop(
+            pos=(randint(0, self.floor_w), randint(0, self.floor_h)),
+            moving=True,
+            surf=choice(self.rain_drops),
+            groups=self.all_sprites,
+            z=LAYERS['rain drops'])
 
     def update(self):
         self.create_floor()
