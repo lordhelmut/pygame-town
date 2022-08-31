@@ -1,8 +1,9 @@
 import logging
-from re import X
+from re import T, X
 import pygame
 from settings import *
 from pytmx.util_pygame import load_pygame
+from support import *
 
 
 class SoilTileSprites(pygame.sprite.Sprite):
@@ -23,6 +24,9 @@ class SoilLayer:
         # graphics
         soil_surf_path = 'graphics/soil/o.png'
         self.soil_surf = pygame.image.load(soil_surf_path)
+        # better soil animations
+        soil_fol_path = 'graphics/soil/'
+        self.soil_surfs = import_folder_dict(soil_fol_path)
 
         # instantiate the class methods
         self.create_soil_grid()
