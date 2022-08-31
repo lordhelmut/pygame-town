@@ -10,7 +10,8 @@ from pytmx.util_pygame import load_pygame
 from support import *
 from transition import Transition
 from soil import SoilLayer
-
+from sky import Rain
+from random import randint
 
 class Level:
     def __init__(self):
@@ -38,6 +39,12 @@ class Level:
 
         # new transition class
         self.transition = Transition(self.reset_scene, self.player)
+
+        # sky
+        self.rain = Rain(self.all_sprites)
+        self.raining = randint(0, 10) > 3
+        self.soil_layer.raining = self.raining
+        logging.info(f'is it raining? {self.raining}')
 
     def setup(self):
 
