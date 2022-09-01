@@ -31,7 +31,7 @@ class Level:
         self.interaction_sprites = pygame.sprite.Group()
 
         # populate soil properties
-        self.soil_layer = SoilLayer(self.all_sprites)
+        self.soil_layer = SoilLayer(self.all_sprites, self.collision_sprites)
 
         # start it up
         self.setup()
@@ -148,6 +148,9 @@ class Level:
         self.player.item_inventory[item] += 1
 
     def reset_scene(self):
+
+        # plants
+        self.soil_layer.update_plant_sprites()
 
         # soil
         self.soil_layer.remove_water_tiles()
