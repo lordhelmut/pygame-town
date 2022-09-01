@@ -90,6 +90,7 @@ class Player(pygame.sprite.Sprite):
                 f'self.status direction = {self.status.split("_")[0]}')
 
     def use_seed(self):
+        self.soil_layer.plant_seed(self.target_pos, self.selected_seed)
         if (LOGGINGOPTS == 'DEBUG'):
             logging.debug(f'self.selected_tool: {self.selected_seed}')
 
