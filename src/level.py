@@ -5,7 +5,7 @@ import logging
 from settings import *
 from player import Player
 from overlay import Overlay
-from sprites import GenericSprites, WaterSprites, TreeSprites, WildFlowerSprites, InteractionSprites
+from sprites import GenericSprites, WaterSprites, TreeSprites, WildFlowerSprites, InteractionSprites, ParticleEffects
 from pytmx.util_pygame import load_pygame
 from support import *
 from transition import Transition
@@ -146,6 +146,7 @@ class Level:
 
     def player_add(self, item):
         self.player.item_inventory[item] += 1
+        logging.info(f'inventory: {self.player.item_inventory}')
 
     def reset_scene(self):
 
@@ -171,12 +172,29 @@ class Level:
             # purged all apples above, now re-add
             tree.create_fruit()
 
+    def plant_collision(self):
+        if self.soil_layer.plant_sprites:
+            for plant in self.soil_layer.plant_sprites.sprites():
+                if plant.harvestable and plant.rect.colliderect(self.player.hitbox):
+                    # 1 add inventory
+                    # 2 remove plant
+                    # 3 animations
+                    # 4 reset grid attribute
+                    self.player_add(plant.plant_type)
+                    plant.kill()
+                    ParticleEffects(plant.rect.topleft, plant.image,
+                                    self.all_sprites, z=LAYERS['main'])
+                    self.soil_layer.grid[plant.rect.centery //
+                                         TILE_SIZE][plant.rect.centerx // TILE_SIZE].remove('P')
+
     def run(self, dt):
         # remove previous screens and draw new one
         self.display_surface.fill('black')
         # call the new function for the camera group
         self.all_sprites.custom_draw(self.player)
         self.all_sprites.update(dt)
+
+        self.plant_collision()
 
         # get the overlay from the overlay display function
         self.overlay.display()
