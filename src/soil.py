@@ -90,6 +90,9 @@ class SoilLayer:
                     # add attribute for farming - 'X'
                     self.grid[y][x].append('X')
                     self.create_soil_tiles()
+                    # add rain
+                    if self.raining:
+                        self.water_all()
 
     def water(self, target_pos):
         for soil_sprite in self.soil_sprites.sprites():
