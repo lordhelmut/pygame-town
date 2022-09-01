@@ -152,6 +152,13 @@ class Level:
         # soil
         self.soil_layer.remove_water_tiles()
 
+        # rain
+        self.raining = randint(0, 10) > 3
+        self.soil_layer.raining = self.raining
+        if self.raining:
+            logging.info(f'is it raining? {self.raining}')
+            self.soil_layer.water_all()
+
         # add apples on trees
         for tree in self.tree_sprites.sprites():
             # look for existing fruit

@@ -105,6 +105,21 @@ class SoilLayer:
                     surf=choice(self.water_surfs),
                     groups=[self.all_sprites, self.water_sprites])
 
+    def water_all(self):
+        # water on rainy days
+        for index_row, row in enumerate(self.grid):
+            for index_col, cell in enumerate(row):
+                if 'X' in cell and 'W' not in cell:
+                    cell.append('W')
+                    x = index_col * TILE_SIZE
+                    y = index_row * TILE_SIZE
+                    WaterTileSprites(
+                        pos=(x, y),
+                        surf=choice(self.water_surfs),
+                        groups=[self.all_sprites, self.water_sprites]
+                    )
+
+
     def remove_water_tiles(self):
         # destroy all water sprites
         for sprite in self.water_sprites.sprites():
