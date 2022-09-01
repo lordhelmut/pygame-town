@@ -10,7 +10,7 @@ from pytmx.util_pygame import load_pygame
 from support import *
 from transition import Transition
 from soil import SoilLayer
-from sky import Rain
+from sky import Rain, Sky
 from random import randint
 
 class Level:
@@ -45,6 +45,7 @@ class Level:
         self.raining = randint(0, 10) > 3
         self.soil_layer.raining = self.raining
         logging.info(f'is it raining? {self.raining}')
+        self.sky = Sky()
 
     def setup(self):
 
@@ -172,6 +173,9 @@ class Level:
             # purged all apples above, now re-add
             tree.create_fruit()
 
+        # reset day/night
+        self.sky.start_color = [255, 255, 255]
+
     def plant_collision(self):
         if self.soil_layer.plant_sprites:
             for plant in self.soil_layer.plant_sprites.sprites():
@@ -201,6 +205,9 @@ class Level:
 
         if self.raining:
             self.rain.update()
+
+        # day time
+        self.sky.display(dt)
 
         # check if need to change times
         if self.player.sleep:
