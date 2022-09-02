@@ -12,6 +12,7 @@ from transition import Transition
 from soil import SoilLayer
 from sky import Rain, Sky
 from random import randint
+from menu import Menu
 
 class Level:
     def __init__(self):
@@ -46,6 +47,11 @@ class Level:
         self.soil_layer.raining = self.raining
         logging.info(f'is it raining? {self.raining}')
         self.sky = Sky()
+
+        # shop
+        self.menu = Menu(self.player, self.toggle_shop)
+        self.shop_active = False
+
 
     def setup(self):
 
@@ -128,9 +134,18 @@ class Level:
                     collision_sprites=self.collision_sprites,
                     tree_sprites=self.tree_sprites,
                     interaction=self.interaction_sprites,
-                    soil_layer=self.soil_layer)
+                    soil_layer=self.soil_layer,
+                    toggle_shop=self.toggle_shop)
             # check map layer and see if player is in 'bed' position
             if obj.name == 'Bed':
+                InteractionSprites(
+                    pos=(obj.x, obj.y),
+                    size=(obj.width, obj.height),
+                    groups=self.interaction_sprites,
+                    name=obj.name)
+
+            # trader
+            if obj.name == 'Trader':
                 InteractionSprites(
                     pos=(obj.x, obj.y),
                     size=(obj.width, obj.height),
@@ -144,6 +159,9 @@ class Level:
             surf=pygame.image.load(floor_image).convert_alpha(),
             groups=self.all_sprites,
             z=LAYERS['ground'])
+
+    def toggle_shop(self):
+        self.shop_active = not self.shop_active
 
     def player_add(self, item):
         self.player.item_inventory[item] += 1
@@ -196,14 +214,17 @@ class Level:
         self.display_surface.fill('black')
         # call the new function for the camera group
         self.all_sprites.custom_draw(self.player)
-        self.all_sprites.update(dt)
 
-        self.plant_collision()
+        # updates
+        if self.shop_active:
+            self.menu.update()
+        else:
+            self.all_sprites.update(dt)
+            self.plant_collision()
 
-        # get the overlay from the overlay display function
+        # weather
         self.overlay.display()
-
-        if self.raining:
+        if self.raining and not self.shop_active:
             self.rain.update()
 
         # day time
