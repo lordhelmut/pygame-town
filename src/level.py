@@ -47,6 +47,10 @@ class Level:
         logging.info(f'is it raining? {self.raining}')
         self.sky = Sky()
 
+        # shop
+        self.shop_active = False
+
+
     def setup(self):
 
         # the map was created in "Tiled" software - mapeditor.org
@@ -128,9 +132,18 @@ class Level:
                     collision_sprites=self.collision_sprites,
                     tree_sprites=self.tree_sprites,
                     interaction=self.interaction_sprites,
-                    soil_layer=self.soil_layer)
+                    soil_layer=self.soil_layer,
+                    toggle_shop=self.toggle_shop)
             # check map layer and see if player is in 'bed' position
             if obj.name == 'Bed':
+                InteractionSprites(
+                    pos=(obj.x, obj.y),
+                    size=(obj.width, obj.height),
+                    groups=self.interaction_sprites,
+                    name=obj.name)
+
+            # trader
+            if obj.name == 'Trader':
                 InteractionSprites(
                     pos=(obj.x, obj.y),
                     size=(obj.width, obj.height),
@@ -144,6 +157,9 @@ class Level:
             surf=pygame.image.load(floor_image).convert_alpha(),
             groups=self.all_sprites,
             z=LAYERS['ground'])
+
+    def toggle_shop(self):
+        self.shop_active = not self.shop_active
 
     def player_add(self, item):
         self.player.item_inventory[item] += 1

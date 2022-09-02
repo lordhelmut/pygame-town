@@ -7,7 +7,7 @@ from timer import Timer
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, group, collision_sprites, tree_sprites, interaction, soil_layer):
+    def __init__(self, pos, group, collision_sprites, tree_sprites, interaction, soil_layer, toggle_shop):
         super().__init__(group)
 
         # init setups
@@ -59,6 +59,11 @@ class Player(pygame.sprite.Sprite):
             'corn': 0,
             'tomato': 0
         }
+        self.seed_inventory = {
+            'corn': 5,
+            'tomato': 5
+        }
+        self.money = 200
 
         # interactive position relative to player
         self.tree_sprites = tree_sprites
@@ -68,6 +73,8 @@ class Player(pygame.sprite.Sprite):
         self.sleep = False
 
         self.soil_layer = soil_layer
+
+        self.toggle_shop = toggle_shop
 
     def use_tool(self):
         if self.selected_tool == 'hoe':
@@ -90,7 +97,10 @@ class Player(pygame.sprite.Sprite):
                 f'self.status direction = {self.status.split("_")[0]}')
 
     def use_seed(self):
-        self.soil_layer.plant_seed(self.target_pos, self.selected_seed)
+        # make sure we have enough seeds and subtract whats needed
+        if self.seed_inventory[self.selected_seed] > 0:
+            self.soil_layer.plant_seed(self.target_pos, self.selected_seed)
+            self.seed_inventory[self.selected_seed] -= 1
         if (LOGGINGOPTS == 'DEBUG'):
             logging.debug(f'self.selected_tool: {self.selected_seed}')
 
@@ -210,7 +220,7 @@ class Player(pygame.sprite.Sprite):
                     logging.info(
                         f'You have reached a collision with : {collided_interaction_sprite[0].name}')
                     if collided_interaction_sprite[0].name == 'Trader':
-                        pass
+                        self.toggle_shop()
                     else:
                         # point the character after the collision to make it looking at bed
                         self.status = 'left_idle'
@@ -219,7 +229,8 @@ class Player(pygame.sprite.Sprite):
 
             if keys[pygame.K_i]:
                 # debug whats in the inventory for now
-                logging.info(f'inventory: {self.item_inventory}')
+                logging.info(
+                    f'item inventory: {self.item_inventory} seed inventory: {self.seed_inventory} money: {self.money}')
 
 
     def get_status(self):
