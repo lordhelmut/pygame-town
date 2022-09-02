@@ -12,5 +12,11 @@ class Menu:
         font_path = 'font/LycheeSoda.ttf'
         self.font = pygame.font.Font(font_path, 30)
 
+    def input(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_ESCAPE]:
+            self.toggle_menu()
+
     def update(self):
+        self.input()
         self.display_surface.blit(pygame.Surface((1000,1000)),(0,0))
