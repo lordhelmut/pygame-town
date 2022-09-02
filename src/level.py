@@ -12,6 +12,7 @@ from transition import Transition
 from soil import SoilLayer
 from sky import Rain, Sky
 from random import randint
+from menu import Menu
 
 class Level:
     def __init__(self):
@@ -48,6 +49,7 @@ class Level:
         self.sky = Sky()
 
         # shop
+        self.menu = Menu(self.player, self.toggle_shop)
         self.shop_active = False
 
 
@@ -212,14 +214,17 @@ class Level:
         self.display_surface.fill('black')
         # call the new function for the camera group
         self.all_sprites.custom_draw(self.player)
-        self.all_sprites.update(dt)
 
-        self.plant_collision()
+        # updates
+        if self.shop_active:
+            self.menu.update()
+        else:
+            self.all_sprites.update(dt)
+            self.plant_collision()
 
-        # get the overlay from the overlay display function
+        # weather
         self.overlay.display()
-
-        if self.raining:
+        if self.raining and not self.shop_active:
             self.rain.update()
 
         # day time
