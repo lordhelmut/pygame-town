@@ -27,7 +27,7 @@ jobs:
 
       - name: Run linters
         run: |
-          pylint $(git ls-files '*.py')
+          pylint $(git ls-files '*.py') --exit-zero
 
 
 
