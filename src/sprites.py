@@ -100,7 +100,6 @@ class TreeSprites(GenericSprites):
         # what tree looks like when tree dies
         stump_path = f'graphics/stumps/{"small" if name == "small" else "large"}.png'
         self.stump_surf = pygame.image.load(stump_path).convert_alpha()
-        self.invul_timer = Timer(200)
 
         # apples
         appleimage_path = 'graphics/fruit/apple.png'
@@ -113,8 +112,16 @@ class TreeSprites(GenericSprites):
 
         self.player_add = player_add
 
+        # sounds
+        axe_sound_path = 'audio/axe.mp3'
+        self.axe_sound = pygame.mixer.Sound(axe_sound_path)
+        self.axe_sound = None
+
     def damage(self):
         self.health -= 1
+
+        # play audio on tree hit
+        self.axe_sound.play()
 
         # remove an apple - such that the list has apples available
         if len(self.apple_sprites.sprites()) > 0:

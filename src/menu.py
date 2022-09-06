@@ -60,8 +60,8 @@ class Menu:
             SCREEN_WIDTH / 2 - self.width / 2, self.menu_top, self.width, self.total_height)
 
         # set attributes for buying & selling text
-        self.buy_text = self.font.render('buy', False, 'Black')
-        self.sell_text = self.font.render('sell', False, 'Black')
+        self.buy_text = self.font.render('BUY', False, 'White')
+        self.sell_text = self.font.render('SELL', False, 'White')
 
     def input(self):
         keys = pygame.key.get_pressed()
