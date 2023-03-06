@@ -1,4 +1,4 @@
-autopep8==2.0.1
+autopep8==2.0.2
 pycodestyle==2.10.0
 pygame==2.2.0
 PyTMX==3.31
