@@ -1,5 +1,5 @@
 autopep8==2.0.2
-pycodestyle==2.10.0
+pycodestyle==2.11.0
 pygame==2.5.0
 PyTMX==3.32
 toml==0.10.2
