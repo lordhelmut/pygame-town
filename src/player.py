@@ -76,6 +76,12 @@ class Player(pygame.sprite.Sprite):
 
         self.toggle_shop = toggle_shop
 
+        # sounds
+        player_sound_path = 'audio/water.mp3'
+        pygame.mixer.init()
+        self.watering = pygame.mixer.Sound(player_sound_path)
+        self.watering.set_volume(0.1)
+
     def use_tool(self):
         if self.selected_tool == 'hoe':
             self.soil_layer.get_hit(self.target_pos)
@@ -85,6 +91,7 @@ class Player(pygame.sprite.Sprite):
                     tree.damage()
         if self.selected_tool == 'water':
             self.soil_layer.water(self.target_pos)
+            self.watering.play
         if (LOGGINGOPTS == 'DEBUG'):
             logging.debug(f'self.selected_tool: {self.selected_tool}')
 

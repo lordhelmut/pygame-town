@@ -14,6 +14,7 @@ from sky import Rain, Sky
 from random import randint
 from menu import Menu
 
+
 class Level:
     def __init__(self):
         logging.info('The level has started')
@@ -43,7 +44,7 @@ class Level:
 
         # sky
         self.rain = Rain(self.all_sprites)
-        self.raining = randint(0, 10) > 3
+        self.raining = randint(0, 10) > 7
         self.soil_layer.raining = self.raining
         logging.info(f'is it raining? {self.raining}')
         self.sky = Sky()
@@ -52,6 +53,15 @@ class Level:
         self.menu = Menu(self.player, self.toggle_shop)
         self.shop_active = False
 
+        # music
+        success_path = ('audio/success.wav')
+        self.success = pygame.mixer.Sound(success_path)
+        self.success.set_volume(0.3)
+
+        bgmusic_path = ('audio/music.mp3')
+        self.bg_music = pygame.mixer.Sound(bgmusic_path)
+        self.bg_music.set_volume(0.1)
+        self.bg_music.play(loops=-1)
 
     def setup(self):
 
@@ -165,6 +175,8 @@ class Level:
 
     def player_add(self, item):
         self.player.item_inventory[item] += 1
+        self.success.play()
+
         logging.info(f'inventory: {self.player.item_inventory}')
 
     def reset_scene(self):
@@ -176,7 +188,7 @@ class Level:
         self.soil_layer.remove_water_tiles()
 
         # rain
-        self.raining = randint(0, 10) > 3
+        self.raining = randint(0, 10) > 7
         self.soil_layer.raining = self.raining
         if self.raining:
             logging.info(f'is it raining? {self.raining}')
@@ -262,11 +274,15 @@ class CameraGroup(pygame.sprite.Group):
                         logging.debug(f'layer is {sprite.z}')
 
                     # # find location of target hit
-                    if (SPRITEDEBUG=='DEBUG'):
+                    if (SPRITEDEBUG == 'DEBUG'):
                         if sprite == player:
-                            pygame.draw.rect(self.display_surface,'red',offset_rect,5)
+                            pygame.draw.rect(
+                                self.display_surface, 'red', offset_rect, 5)
                             hitbox_rect = player.hitbox.copy()
                             hitbox_rect.center = offset_rect.center
-                            pygame.draw.rect(self.display_surface,'green',hitbox_rect,5)
-                            target_pos = offset_rect.center + PLAYER_TOOL_OFFSET[player.status.split('_')[0]]
-                            pygame.draw.circle(self.display_surface,'blue',target_pos,5)
+                            pygame.draw.rect(
+                                self.display_surface, 'green', hitbox_rect, 5)
+                            target_pos = offset_rect.center + \
+                                PLAYER_TOOL_OFFSET[player.status.split('_')[0]]
+                            pygame.draw.circle(
+                                self.display_surface, 'blue', target_pos, 5)
